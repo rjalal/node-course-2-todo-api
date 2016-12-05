@@ -10,7 +10,15 @@ const todos = [{
     text:'First test todo'
 }, {
     _id: new ObjectID(),
-    text:'Second test todo'
+    text:'Second test todo',
+    completed: true,
+    completedAt: 333
+},
+{
+    _id: new ObjectID(),
+    text:'Third test todo',
+    completed: true,
+    completedAt: 333
 }];
 
 beforeEach((done)=> {
@@ -56,7 +64,7 @@ describe('POST /todos', () => {
                 }
 
                 Todo.find().then((todos)=> {
-                    expect(todos.length).toBe(2);
+                    expect(todos.length).toBe(3);
                     done();
                 }).catch((e) => done(e));
             })   
@@ -70,7 +78,7 @@ describe('GET /todos', ()=>{
         .get('/todos')
         .expect(200)
         .expect((res)=>{
-            expect(res.body.todos.length).toBe(2);
+            expect(res.body.todos.length).toBe(3);
         })
         .end(done);
     })
@@ -151,5 +159,56 @@ describe('DELETE /todos/:id', ()=>{
             .expect(404)
             .end(done);
      });
+});
 
+describe('PATCH /todos/:id', () => {
+    it('should update todo', (done)=>{
+        //grap id for first item
+        var hexId = todos[0]._id.toHexString();
+        text = 'Something else to do';
+        //update text, set completed true 
+        //200
+        // text is changed, compelted is true, completedAt is a number 
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send({
+                text,
+                completed:true
+            })
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toNotBe(todos[0].text);
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toBeA('number');
+            })
+            .end(done);
+    });
+
+    it('should clear completed at when todo is not completed',(done)=>{
+        //grap id for second todo item
+        var hexId = todos[1]._id.toHexString();
+        text = 'Something else to do';
+        //update text, set completed true 
+        //200
+        // text is changed, compelted is true, completedAt is a number 
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send({
+                text,
+                completed:false
+            })
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toNotBe(todos[1].text);
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toNotExist;
+            })
+            .end(done);
+
+    });
 })
+
