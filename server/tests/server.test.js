@@ -71,9 +71,8 @@ describe('POST /todos', () => {
     })
 });
 
-describe('GET /todos', ()=>{
+describe('GET /todos', ()=>{ 
     it('should get all todos.', (done)=>{
-
     request(app)
         .get('/todos')
         .expect(200)
@@ -81,7 +80,7 @@ describe('GET /todos', ()=>{
             expect(res.body.todos.length).toBe(3);
         })
         .end(done);
-    })
+    });
 });
 
 describe('GET /todos/:id', ()=>{
@@ -100,7 +99,6 @@ describe('GET /todos/:id', ()=>{
      it('should return 404 if todo not found', (done)=>{
     //     //Make sure you get 404 back 
         var newObjectId = new ObjectID().toHexString();
-
         request(app)
             .get(`/todos/${newObjectId}`)
             .expect(404)
